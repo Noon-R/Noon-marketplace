@@ -8,7 +8,6 @@
     {
       "name": "learning-log",
       "source": "./plugins/learning-log",
-      "displayName": "Learning Log",
       "description": "Automatically record learning notes and insights to a timestamped log file",
       "version": "1.0.0"
     }
