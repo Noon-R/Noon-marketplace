@@ -1,0 +1,16 @@
+{
+  "name": "noon-tools",
+  "owner": {
+    "name": "Noon",
+    "email": "noon.ryou0304@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "learning-log",
+      "source": "./plugins/learning-log",
+      "displayName": "Learning Log",
+      "description": "Automatically record learning notes and insights to a timestamped log file",
+      "version": "1.0.0"
+    }
+  ]
+}
