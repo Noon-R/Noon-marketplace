@@ -1,5 +1,5 @@
     {
       "name": "learning-log",
-      "description": "Automatically record learning notes and insights to a timestamped log file",
-      "version": "1.0.0"
+      "description": "Automatically record learning notes and insights to a timestamped log file with AI-generated supplements and web search references",
+      "version": "1.2.0"
     }

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Log an entry to the learning log file.
 
@@ -13,6 +14,12 @@ import argparse
 from datetime import datetime
 import os
 import sys
+import io
+
+# Force UTF-8 encoding for stdout/stderr on Windows
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 
 def log_entry(category: str, message: str, log_file: str = "docs/learning_log.md"):
