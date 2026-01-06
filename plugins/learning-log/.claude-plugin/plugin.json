@@ -1,5 +1,6 @@
     {
       "name": "learning-log",
-      "description": "Automatically record learning notes and insights to a timestamped log file with AI-generated supplements and web search references",
-      "version": "1.2.0"
+      "description": "Automatically record learning notes and insights to a timestamped log file with AI-generated supplements and web search references. Create structured summaries through interactive dialogue.",
+      "version": "1.3.0",
+      "skills": "./skills/"
     }
