@@ -10,6 +10,12 @@
       "source": "./plugins/learning-log",
       "description": "Automatically record learning notes and insights to a timestamped log file with AI-generated supplements and web search references. Create structured summaries through interactive dialogue.",
       "version": "1.3.0"
+    },
+    {
+      "name": "dev-workflow",
+      "source": "./plugins/dev-workflow",
+      "description": "開発ワークフロー管理プラグイン。設計→実装→検証の統合ワークフロー、コーディング規約管理、スキル・プラグイン作成支援を提供。8つのスキル：implementation-workflow, design-discussion, implementation, behavior-verification, coding-standards, coding-standards-creator, skill-updater, plugin-creator",
+      "version": "1.1.0"
     }
   ]
 }
