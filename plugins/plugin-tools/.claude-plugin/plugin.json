@@ -1,0 +1,6 @@
+{
+  "name": "plugin-tools",
+  "description": "プラグイン・スキル管理ツール。新規プラグイン作成、既存スキルの更新・バリデーションを支援。",
+  "version": "1.0.0",
+  "skills": "./skills/"
+}

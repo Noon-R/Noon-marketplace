@@ -14,8 +14,14 @@
     {
       "name": "dev-workflow",
       "source": "./plugins/dev-workflow",
-      "description": "開発ワークフロー管理プラグイン。設計→実装→検証の統合ワークフロー、コーディング規約管理、スキル・プラグイン作成支援を提供。8つのスキル：implementation-workflow, design-discussion, implementation, behavior-verification, coding-standards, coding-standards-creator, skill-updater, plugin-creator",
-      "version": "1.1.0"
+      "description": "開発ワークフロー管理プラグイン。設計→実装→検証の統合ワークフロー、コーディング規約管理を提供。6つのスキル：implementation-workflow, design-discussion, implementation, behavior-verification, coding-standards, coding-standards-creator",
+      "version": "1.2.0"
+    },
+    {
+      "name": "plugin-tools",
+      "source": "./plugins/plugin-tools",
+      "description": "プラグイン・スキル管理ツール。新規プラグイン作成（plugin-creator）、既存スキルの更新・バリデーション（skill-updater）を支援。",
+      "version": "1.0.0"
     }
   ]
 }
