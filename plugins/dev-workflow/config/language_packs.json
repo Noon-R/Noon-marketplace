@@ -1,0 +1,24 @@
+{
+  "language_packs": {
+    "unity": {
+      "display_name": "Unity",
+      "keywords": ["unity", "unity3d", "game", "gamedev"],
+      "file_path": "references/unity/standards.md",
+      "metadata_path": "references/unity/metadata.json",
+      "status": "available",
+      "priority": 1,
+      "detail_level": "enterprise"
+    },
+    "csharp-project": {
+      "display_name": "C# Project",
+      "keywords": ["csharp", "c#", "dotnet", ".net", "cs"],
+      "file_path": "references/csharp-project/standards.md",
+      "metadata_path": "references/csharp-project/metadata.json",
+      "status": "available",
+      "priority": 2,
+      "detail_level": "enterprise"
+    }
+  },
+  "version": "1.0.0",
+  "last_updated": "2026-01-14"
+}

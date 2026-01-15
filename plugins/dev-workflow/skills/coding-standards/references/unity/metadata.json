@@ -1,0 +1,18 @@
+{
+  "language": "unity",
+  "display_name": "Unity",
+  "version": "1.0.0",
+  "frameworks": ["Unity 2022+", "Unity 6"],
+  "detail_level": "enterprise",
+  "keywords": ["unity", "unity3d", "game", "gamedev"],
+  "sections": [
+    "naming", "format", "class", "method", "async",
+    "comments", "performance", "var", "error-handling",
+    "linq", "types", "testing", "security", "tools", "resources"
+  ],
+  "constraints": {
+    "linq_prohibited": true,
+    "try_catch_prohibited": true
+  },
+  "last_updated": "2026-01-14"
+}

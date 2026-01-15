@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Skill(learning-log:learning-log)",
+      "Skill(learning-log:learning-log:*)",
+      "Bash(python scripts/log_entry.py:*)",
+      "Bash(python scripts/review_and_supplement.py:*)",
+      "Bash(python:*)",
+      "Bash(git add:*)",
+      "Bash(git push)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" status --porcelain plugins/dev-workflow/)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/README.md)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/skills/dev-flow/SKILL.md)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/skills/implementation-plan/SKILL.md)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/skills/code-review/SKILL.md)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/skills/coding-standards/SKILL.md)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/skills/log-injection/SKILL.md)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/config/dev-workflow.json)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/skills/implementation-plan/scripts/create_plan.py)",
+      "Bash(git -C \"D:/0_Data/Developer/999_claude/Noon-marketplace\" show :plugins/dev-workflow/skills/coding-standards/scripts/manage_standards.py)"
+    ]
+  }
+}
