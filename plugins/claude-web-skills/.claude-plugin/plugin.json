@@ -1,0 +1,6 @@
+{
+  "name": "claude-web-skills",
+  "description": "Claude Code Webセッション向けスキル集。simplifyとsession-start-hookを含む。",
+  "version": "1.0.0",
+  "skills": "./skills/"
+}
