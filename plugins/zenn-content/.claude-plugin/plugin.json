@@ -1,0 +1,6 @@
+{
+  "name": "zenn-content",
+  "description": "Zenn記事・本の作成・管理プラグイン。どのプロジェクトからでもZenn記事の新規作成、外部プロジェクト同期が可能。",
+  "version": "1.0.0",
+  "skills": "./skills/"
+}

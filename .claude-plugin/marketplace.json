@@ -22,6 +22,12 @@
       "source": "./plugins/plugin-tools",
       "description": "プラグイン・スキル管理ツール。新規プラグイン作成（plugin-creator）、既存スキルの更新・バリデーション（skill-updater）を支援。",
       "version": "1.0.0"
+    },
+    {
+      "name": "zenn-content",
+      "source": "./plugins/zenn-content",
+      "description": "Zenn記事・本の作成・管理プラグイン。どのプロジェクトからでもZenn記事の新規作成（zenn-article）、外部プロジェクト同期（zenn-sync）、公開・デプロイ（zenn-publish）が可能。",
+      "version": "1.0.0"
     }
   ]
 }
