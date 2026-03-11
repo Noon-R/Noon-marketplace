@@ -1,0 +1,7 @@
+{
+  "name": "aggregate-hyperlinks",
+  "description": "ドキュメント作成・編集時にハイパーリンクを自動抽出し、一つのファイルに集約するプラグイン。PostToolUse フックにより Write/Edit ツール使用後に自動実行。手動スキャンも可能。",
+  "version": "1.0.0",
+  "skills": "./skills/",
+  "hooks": "./hooks/"
+}
