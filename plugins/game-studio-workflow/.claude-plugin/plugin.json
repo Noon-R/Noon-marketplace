@@ -1,0 +1,6 @@
+{
+  "name": "game-studio-workflow",
+  "description": "ゲーム開発スタジオ統合ワークフロー。48エージェント、41スキル、動的コーディング規約、進捗追跡を提供。",
+  "version": "1.0.0",
+  "skills": "./skills/"
+}

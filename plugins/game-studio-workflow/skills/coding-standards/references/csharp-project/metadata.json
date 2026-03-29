@@ -1,0 +1,15 @@
+{
+  "language": "csharp-project",
+  "display_name": "C# Project",
+  "version": "1.0.0",
+  "frameworks": [".NET 6+", ".NET 8"],
+  "detail_level": "enterprise",
+  "keywords": ["csharp", "c#", "dotnet", ".net", "cs"],
+  "sections": [
+    "naming", "format", "class", "method", "async",
+    "comments", "performance", "var", "error-handling",
+    "linq", "types", "testing", "security", "tools", "resources"
+  ],
+  "constraints": {},
+  "last_updated": "2026-01-14"
+}
