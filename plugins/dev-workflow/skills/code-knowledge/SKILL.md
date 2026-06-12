@@ -13,11 +13,11 @@ This skill provides implementation knowledge (coding standards, technical constr
 
 Each pack has up to 3 layers. **Never load everything at once** — load only what the current task needs:
 
-| Layer | Content | Size Budget | When to Load |
-|-------|---------|-------------|--------------|
-| **core.md** | Critical constraints with ❌→✅ rewrite pairs, essential style table | ~2KB | **Always** (before writing any code) |
-| **examples/** | Golden samples — small compilable files embodying many rules at once | ~100 lines each | Before implementation (pick the sample matching the code type) |
-| **sections/** | Detailed per-topic rules (naming, error-handling, etc.) | 1-4KB each | **On demand only** — when a specific question arises |
+| Layer | Content | When to Load |
+|-------|---------|--------------|
+| **core.md** | Critical constraints with ❌→✅ rewrite pairs, essential style table | **Always** (before writing any code) |
+| **examples/** | Golden samples — small compilable files embodying many rules at once | Before implementation (pick the sample matching the code type) |
+| **sections/** | Detailed per-topic rules (naming, error-handling, etc.) | **On demand only** — when a specific question arises |
 
 Packs with `"format": "monolithic"` are legacy single-file packs (`standards.md`). Load the whole file for those, and consider migrating them with code-knowledge-creator.
 
@@ -74,39 +74,12 @@ Offer the user:
 - `references/<pack>/standards.md`: Full document (monolithic packs)
 - `references/<pack>/metadata.json`: Pack metadata with section index
 
-### Pack Registry Format
-
-```json
-{
-  "knowledge_packs": {
-    "pack-key": {
-      "display_name": "Display Name",
-      "keywords": ["search", "keywords"],
-      "format": "structured | monolithic",
-      "core_path": "references/pack/core.md",
-      "examples_dir": "references/pack/examples/",
-      "sections_dir": "references/pack/sections/",
-      "metadata_path": "references/pack/metadata.json",
-      "status": "available | planned | deprecated",
-      "priority": 1,
-      "detail_level": "basic | detailed | enterprise"
-    }
-  }
-}
-```
-
 ### Error Handling
 
 - Python script execution failure: read `config/knowledge_packs.json` directly
 - Config file load failure: glob `references/*/metadata.json` as fallback
 - Referenced file missing: report which file and suggest code-knowledge-creator for repair
 
-## Updating the Skill
+## Creating or Updating Packs
 
-After adding or updating knowledge packs, refresh the dynamic content section:
-
-```bash
-python scripts/generate_skill_content.py update
-```
-
-This updates only the content between `<!-- DYNAMIC_CONTENT_START -->` and `<!-- DYNAMIC_CONTENT_END -->` markers, preserving manual edits elsewhere.
+Pack creation, updates, migration, registry format, and size budgets are owned by the **code-knowledge-creator** skill. This skill only consumes packs.

@@ -115,10 +115,31 @@ Write detail rules per topic. Delete unused starter files. Register each section
 
 ### Step 7: Register & Validate
 
-1. Register in `config/knowledge_packs.json` (`"format": "structured"`)
+1. Register in `config/knowledge_packs.json` (`"format": "structured"`). Registry entry format:
+
+```json
+{
+  "knowledge_packs": {
+    "pack-key": {
+      "display_name": "Display Name",
+      "keywords": ["search", "keywords"],
+      "format": "structured | monolithic",
+      "core_path": "references/pack/core.md",
+      "examples_dir": "references/pack/examples/",
+      "sections_dir": "references/pack/sections/",
+      "metadata_path": "references/pack/metadata.json",
+      "status": "available | planned | deprecated",
+      "priority": 1,
+      "detail_level": "basic | detailed | enterprise"
+    }
+  }
+}
+```
+
+   (Monolithic packs use `file_path` instead of `core_path`/`examples_dir`/`sections_dir`.)
 2. Validate: `python scripts/knowledge_pack_creator.py validate <pack_key>`
    - Warns on core.md size overrun, missing ❌/✅ pairs, unregistered examples
-3. Run `code-knowledge/scripts/generate_skill_content.py update` to refresh the dynamic SKILL.md section
+3. Run `code-knowledge/scripts/generate_skill_content.py update` to refresh the dynamic section of code-knowledge's SKILL.md (updates only the content between the `DYNAMIC_CONTENT` markers, preserving manual edits)
 4. Confirm the new pack resolves via the code-knowledge skill
 
 ---
