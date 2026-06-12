@@ -1,0 +1,6 @@
+{
+  "name": "pptx-creator",
+  "description": "PowerPoint資料作成プラグイン。テンプレート.pptx（スライドマスター）の差し替えと、テンプレートごとのデザインドキュメントに基づく資料生成に対応。依存OSSはpython-pptxのみ。",
+  "version": "1.0.0",
+  "skills": "./skills/"
+}

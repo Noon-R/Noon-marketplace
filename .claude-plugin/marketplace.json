@@ -30,6 +30,12 @@
       "version": "1.0.0"
     },
     {
+      "name": "pptx-creator",
+      "source": "./plugins/pptx-creator",
+      "description": "PowerPoint資料作成プラグイン。テンプレート.pptx（スライドマスター）の差し替えと、テンプレートごとのデザインドキュメントに基づく資料生成に対応。依存OSSはpython-pptxのみ。1スキル：pptx-create",
+      "version": "1.0.0"
+    },
+    {
       "name": "game-studio-workflow",
       "source": "./plugins/game-studio-workflow",
       "description": "インディーゲーム開発スタジオ向けワークフロープラグイン。48の専門エージェント（ゲームデザイナー、プログラマー、アートディレクターなど）と30以上のスキルを提供。Godot/Unity/Unreal対応。",
