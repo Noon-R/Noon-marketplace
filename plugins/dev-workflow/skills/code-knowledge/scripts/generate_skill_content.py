@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generate dynamic content for SKILL.md based on language_packs.json.
+Generate dynamic content for SKILL.md based on knowledge_packs.json.
 
 Usage:
     python generate_skill_content.py update    # Update SKILL.md dynamic content
@@ -26,7 +26,7 @@ def get_paths():
     """Get paths to config and SKILL.md files."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    config_path = os.path.join(script_dir, '..', '..', '..', 'config', 'language_packs.json')
+    config_path = os.path.join(script_dir, '..', '..', '..', 'config', 'knowledge_packs.json')
     skill_path = os.path.join(script_dir, '..', 'SKILL.md')
 
     return {
@@ -35,8 +35,8 @@ def get_paths():
     }
 
 
-def load_language_packs():
-    """Load language packs configuration."""
+def load_config():
+    """Load knowledge packs configuration."""
     paths = get_paths()
     config_path = paths['config']
 
@@ -52,40 +52,67 @@ def load_language_packs():
         return None
 
 
+def load_pack_constraints(pack):
+    """Load constraint flags from a pack's metadata.json, if present."""
+    metadata_path = pack.get('metadata_path')
+    if not metadata_path:
+        return {}
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    full_path = os.path.normpath(os.path.join(script_dir, '..', metadata_path))
+
+    if not os.path.exists(full_path):
+        return {}
+
+    try:
+        with open(full_path, 'r', encoding='utf-8') as f:
+            metadata = json.load(f)
+            return metadata.get('constraints', {})
+    except Exception:
+        return {}
+
+
+CONSTRAINT_LABELS = {
+    'linq_prohibited': 'LINQ禁止',
+    'try_catch_prohibited': 'try-catch例外処理禁止',
+    'task_prohibited': 'Task禁止'
+}
+
+
 def generate_dynamic_content(config):
     """Generate the dynamic content section."""
-    packs = config.get('language_packs', {})
+    packs = config.get('knowledge_packs', {})
     version = config.get('version', '1.0.0')
     last_updated = config.get('last_updated', datetime.now().strftime('%Y-%m-%d'))
 
     lines = []
-    lines.append(f"\n## 利用可能な言語パック\n")
-    lines.append(f"以下の言語パックが利用可能です (最終更新: {last_updated}, version: {version})\n")
-    lines.append("| キーワード | 言語/規約 | ファイル | 状態 |")
-    lines.append("|-----------|----------|---------|------|")
+    lines.append(f"\n## 利用可能なナレッジパック\n")
+    lines.append(f"以下のナレッジパックが利用可能です (最終更新: {last_updated}, version: {version})\n")
+    lines.append("| キーワード | パック | 形式 | 状態 |")
+    lines.append("|-----------|--------|------|------|")
 
     for key, pack in sorted(packs.items(), key=lambda x: x[1].get('priority', 999)):
         keywords = "'" + "', '".join(pack.get('keywords', [])) + "'"
         display_name = pack.get('display_name', key)
-        file_path = pack.get('file_path', 'N/A')
+        pack_format = pack.get('format', 'monolithic')
         status = pack.get('status', 'unknown')
         status_text = 'OK' if status == 'available' else 'PLANNED' if status == 'planned' else 'N/A'
 
-        lines.append(f"| {keywords} | {display_name} | [{file_path}]({file_path}) | {status_text} |")
+        lines.append(f"| {keywords} | {display_name} | {pack_format} | {status_text} |")
 
-    lines.append("\n## 利用可能な言語パック（詳細）\n")
+    lines.append("\n## 利用可能なナレッジパック（詳細）\n")
 
     for key, pack in sorted(packs.items(), key=lambda x: x[1].get('priority', 999)):
         display_name = pack.get('display_name', key)
         keywords = "'" + "', '".join(pack.get('keywords', [])) + "'"
         detail_level = pack.get('detail_level', 'basic')
 
-        # Add special notes for Unity
-        if key == 'unity':
-            lines.append(f"- **{display_name}**: {keywords} (詳細度: {detail_level})")
-            lines.append(f"  - **重要な制約**: Linq禁止、try-catch例外処理禁止")
-        else:
-            lines.append(f"- **{display_name}**: {keywords} (詳細度: {detail_level})")
+        lines.append(f"- **{display_name}**: {keywords} (詳細度: {detail_level})")
+
+        constraints = load_pack_constraints(pack)
+        labels = [CONSTRAINT_LABELS.get(k, k) for k, v in constraints.items() if v]
+        if labels:
+            lines.append(f"  - **重要な制約**: {'、'.join(labels)}（core.md参照）")
 
     lines.append("")
 
@@ -95,7 +122,7 @@ def generate_dynamic_content(config):
 def update_skill_md(preview_only=False):
     """Update SKILL.md with generated content."""
     paths = get_paths()
-    config = load_language_packs()
+    config = load_config()
 
     if config is None:
         return False
@@ -107,7 +134,6 @@ def update_skill_md(preview_only=False):
         print(dynamic_content)
         return True
 
-    # Read current SKILL.md
     skill_path = paths['skill']
     if not os.path.exists(skill_path):
         print(f"Error: SKILL.md not found at {skill_path}", file=sys.stderr)
@@ -130,7 +156,6 @@ def update_skill_md(preview_only=False):
         print("Warning: Dynamic content markers not found in SKILL.md", file=sys.stderr)
         return False
 
-    # Write updated content
     try:
         with open(skill_path, 'w', encoding='utf-8') as f:
             f.write(new_content)

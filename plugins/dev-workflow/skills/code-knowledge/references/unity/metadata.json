@@ -1,0 +1,68 @@
+{
+  "language": "unity",
+  "display_name": "Unity",
+  "version": "2.0.0",
+  "frameworks": ["Unity 2022+", "Unity 6"],
+  "detail_level": "enterprise",
+  "format": "structured",
+  "keywords": ["unity", "unity3d", "game", "gamedev"],
+  "core_path": "references/unity/core.md",
+  "examples": [
+    {
+      "path": "references/unity/examples/golden_service.cs",
+      "description": "一般クラスのゴールデンサンプル（構成順序・命名・Result/TryPattern・LINQ代替・XMLコメント）"
+    },
+    {
+      "path": "references/unity/examples/golden_monobehaviour.cs",
+      "description": "MonoBehaviourのゴールデンサンプル（SerializeField・Awakeキャッシュ・コルーチン・非例外エラー処理）"
+    }
+  ],
+  "sections": {
+    "naming": {
+      "path": "references/unity/sections/naming.md",
+      "description": "命名規則の詳細（ケース規則、イベント/Boolean/コレクション/ID命名）"
+    },
+    "formatting": {
+      "path": "references/unity/sections/formatting.md",
+      "description": "フォーマット（インデント、波括弧、空白、if文、行長、var使用基準）"
+    },
+    "class-design": {
+      "path": "references/unity/sections/class-design.md",
+      "description": "クラス構成順序、アクセス修飾子、メソッド設計、型システム・ジェネリクス"
+    },
+    "async": {
+      "path": "references/unity/sections/async.md",
+      "description": "非同期パターン（コルーチン/UniTask、Task禁止の理由と使い分け）"
+    },
+    "comments": {
+      "path": "references/unity/sections/comments.md",
+      "description": "XMLドキュメントコメントとインラインコメントの書き方"
+    },
+    "performance": {
+      "path": "references/unity/sections/performance.md",
+      "description": "StringBuilder、コレクション選択、GetComponentキャッシュ等のパフォーマンス"
+    },
+    "error-handling": {
+      "path": "references/unity/sections/error-handling.md",
+      "description": "🔴 try-catch禁止の詳細、Result<T>パターン、TryPattern、入力検証"
+    },
+    "collections": {
+      "path": "references/unity/sections/collections.md",
+      "description": "🔴 LINQ禁止の詳細、Where/FirstOrDefault/Any/Countの代替パターン集"
+    },
+    "testing": {
+      "path": "references/unity/sections/testing.md",
+      "description": "ユニットテスト（AAA）、Unity Test Framework、セキュリティ・入力検証"
+    },
+    "tools": {
+      "path": "references/unity/sections/tools.md",
+      "description": "EditorConfig、推奨ツール、Assembly Definition、参考資料"
+    }
+  },
+  "constraints": {
+    "linq_prohibited": true,
+    "try_catch_prohibited": true,
+    "task_prohibited": true
+  },
+  "last_updated": "2026-06-12"
+}

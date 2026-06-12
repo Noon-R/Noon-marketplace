@@ -14,8 +14,8 @@
     {
       "name": "dev-workflow",
       "source": "./plugins/dev-workflow",
-      "description": "開発ワークフロー管理プラグイン。設計→実装→検証の統合ワークフロー、コーディング規約管理を提供。6つのスキル：implementation-workflow, design-discussion, implementation, behavior-verification, coding-standards, coding-standards-creator",
-      "version": "1.2.0"
+      "description": "開発ワークフロー管理プラグイン。設計→実装→検証→レビューの統合ワークフロー（相談はメインスレッド、作業は自律agent）と、ナレッジパックによる実装知識管理を提供。6スキル：implementation-workflow, design-discussion, implementation, behavior-verification, code-knowledge, code-knowledge-creator。3エージェント：implementer, verifier, reviewer",
+      "version": "2.0.0"
     },
     {
       "name": "plugin-tools",
@@ -27,6 +27,12 @@
       "name": "zenn-content",
       "source": "./plugins/zenn-content",
       "description": "Zenn記事・本の作成・管理プラグイン。どのプロジェクトからでもZenn記事の新規作成（zenn-article）、外部プロジェクト同期（zenn-sync）、公開・デプロイ（zenn-publish）が可能。",
+      "version": "1.0.0"
+    },
+    {
+      "name": "game-studio-workflow",
+      "source": "./plugins/game-studio-workflow",
+      "description": "インディーゲーム開発スタジオ向けワークフロープラグイン。48の専門エージェント（ゲームデザイナー、プログラマー、アートディレクターなど）と30以上のスキルを提供。Godot/Unity/Unreal対応。",
       "version": "1.0.0"
     }
   ]

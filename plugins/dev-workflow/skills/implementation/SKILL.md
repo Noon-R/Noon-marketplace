@@ -1,247 +1,119 @@
 ---
 name: implementation
 description: |
-  Execute implementation based on a design document.
-  Use when user wants to implement code based on a design, or when proceeding from design-discussion.
-  Triggers include "実装して", "コードを書いて", "implement this", "この設計で実装",
-  or when implementation-workflow transitions to implementation stage.
-  Reads design from file or direct input, produces working code following project conventions.
+  Execute implementation based on a design document, in the main thread.
+  Use when user wants to implement code interactively based on a design. For autonomous workflow execution, implementation-workflow uses the implementer agent instead.
+  Triggers include "実装して", "コードを書いて", "implement this", "この設計で実装".
+  Reads design from file or direct input, loads the knowledge pack progressively, produces working code.
 ---
 
-Execute implementation based on design documents. Produces working code following project conventions and best practices.
+Execute implementation based on design documents, interactively in the main thread.
+
+> **Note:** implementation-workflowから呼ばれる場合は、このスキルではなく**implementer agent**が使われる。このスキルはスタンドアロンで対話的に実装したいケース向け。
 
 ## Workflow Overview
 
-Three-stage process:
-
 1. **Design Input**: Receive and validate design document
-2. **Implementation Execution**: Write code following design and conventions
+2. **Implementation Execution**: Write code following design and knowledge pack
 3. **Output Generation**: Produce implementation files and summary
 
 ## Input Modes
 
-This skill supports multiple input modes:
-
-### Mode 1: File Reference
-
-User provides path to design document (e.g., `{prefix}_design_output.md`).
-- Read the file and extract DESIGN_OUTPUT section
-- Validate design completeness
-- Ask clarifying questions if needed
-
-### Mode 2: Direct Input
-
-User provides design content directly in chat.
-- Parse the design structure
-- Confirm understanding before implementing
-
-### Mode 3: Workflow Integration
-
-When called from implementation-workflow, receive design path from workflow context.
+- **File Reference**: Path to design document (`{prefix}_design_output.md`) — extract DESIGN_OUTPUT section
+- **Direct Input**: Design content in chat — parse and confirm understanding
+- **Workflow Integration**: Design path from workflow context
 
 ---
 
 ## Stage 1: Design Input
 
-**Goal:** Understand the design and prepare for implementation.
-
 ### Design Validation
 
-Check the design document contains:
+Check the design document contains: module/class structure, interface definitions, data flow, design decisions, knowledge pack specification. If missing critical information, ask clarifying questions before proceeding.
 
-- [ ] Clear module/class structure
-- [ ] Interface definitions
-- [ ] Data flow description
-- [ ] Design decisions with rationale
-- [ ] Coding standards specification
+### Load Knowledge Pack（段階ロード）
 
-If missing critical information, ask clarifying questions before proceeding.
+設計書の「Knowledge Pack」セクションのパックキーを使い、code-knowledgeスキルの構造からロードする:
 
-### Load Coding Standards
+1. `references/{pack}/metadata.json` — ファイルパスとセクション索引
+2. `references/{pack}/core.md` — **絶対遵守の制約**
+3. 書くコードの種類に合うゴールデンサンプル（`examples/`）
 
-From the design document, extract specified coding standards:
+詳細セクション（`sections/*.md`）は**実装中に疑問が生じたときだけ**読む。全文の先読みはしない。
 
-1. **Read standards reference**: Check "Coding Standards" section in design document
-2. **Load from coding-standards skill**: Read referenced standards from `coding-standards/references/`
-3. **Apply standards**: Use loaded standards during implementation
-
-If standards not specified in design:
-- Ask user which standards to apply
-- List available standards from coding-standards skill
-- Allow custom standards input
+パック指定が設計書にない場合: `scripts/list_knowledge.py` で一覧を提示し、ユーザーに選択を求める。該当なしなら一般的なベストプラクティスで進める。
 
 ### Pre-Implementation Checklist
 
-Confirm with user:
-
-1. Target directory for implementation
-2. Language/framework if not specified in design
-3. Coding standards confirmed (from design or user selection)
-4. Existing files to integrate with (if any)
+Confirm with user: target directory / language・framework (if not in design) / knowledge pack / existing files to integrate with.
 
 ---
 
 ## Stage 2: Implementation Execution
 
-**Goal:** Write code following design and conventions.
+1. **Start with structure**: File/folder structure first
+2. **Core interfaces**: Public interfaces/APIs
+3. **Internal logic**: Implementation details
+4. **Error handling**: core.mdの流儀に従う（例: Unityなら例外でなく戻り値）
+5. **Integration points**: Connect with existing code
 
-### Implementation Approach
+迷ったらゴールデンサンプルの書き方に合わせる。設計との乖離は逐次記録する。
 
-1. **Start with structure**: Create file/folder structure first
-2. **Core interfaces**: Implement public interfaces/APIs
-3. **Internal logic**: Fill in implementation details
-4. **Error handling**: Add error handling per design
-5. **Integration points**: Connect with existing code if applicable
-
-### Coding Conventions
-
-**Load from coding-standards skill:**
-
-Retrieve coding standards specified in the design document:
-
-```
-# Call coding-standards skill
-Check available standards: coding-standards
-Get specific standards: coding-standards <keywords>
-
-# Examples:
-coding-standards unity       # Get Unity standards
-coding-standards csharp      # Get C# Project standards
-```
-
-**Apply standards:**
-
-- Call coding-standards with language/framework keywords specified in design document
-- Proceed with implementation based on retrieved standards
-- Apply general coding principles if standards not found
-
-**Fallback handling:**
-
-- Standards unavailable: Apply language-specific best practices
-- System error: Continue with basic coding principles
-
-**General defaults** (when no specific standard applies):
-
-- Clear, descriptive naming
-- Single responsibility per function/class
-- Minimal comments (code should be self-documenting)
-- Handle errors explicitly
-
-**Language-specific:**
-
-Apply idiomatic patterns for the target language, combined with project-specific standards.
-
-### Progress Updates
-
-During implementation, provide periodic updates:
-
-- Components completed
-- Next steps
+**General defaults**（パックがない場合）: clear naming, single responsibility, minimal comments, explicit error handling, idiomatic patterns for the target language.
 
 ---
 
 ## Stage 3: Output Generation
 
-**Goal:** Produce implementation files and summary.
+### Self-Verification
 
-### Implementation Files
-
-Create actual code files in the target directory.
+完了前に: core.md制約への違反をGrepで確認（例: `using System.Linq` / `catch`）。ビルド可能なら実行して確認。
 
 ### Implementation Summary
-
-Generate a summary document:
 
 ```markdown
 <!-- IMPLEMENTATION_OUTPUT -->
 # Implementation: {Feature Name}
 
-## Applied Coding Standards
-- Standards used: {list of applied standards}
-- Reference: {link to coding-standards skill or specific reference files}
+## Applied Knowledge Pack
+- Pack: {pack key} (core.md + {使用したサンプル/セクション})
 
 ## Files Created
-
 | File | Purpose |
 |------|---------|
-| path/to/file.ext | Description |
-| ... | ... |
 
 ## Implementation Summary
-Brief description of what was implemented.
+{description}
 
 ## Key Components
-
-### Component 1
-- Location: path/to/file
-- Purpose: what it does
-- Key methods/functions
-
-### Component 2
-...
+{location / purpose / key methods per component}
 
 ## Deviations from Design
-
 | Item | Deviation | Reason |
-|------|-----------|--------|
-| ... | ... | ... |
+（なければ "None - implemented as designed"）
 
-(If no deviations, state "None - implemented as designed")
+## Self-Verification
+- Constraint check: {結果}
+- Build/Compile: {結果}
 
 ## Dependencies Added
-- dependency1: purpose
-- dependency2: purpose
-
-(If no dependencies, state "None")
+（なければ "None"）
 
 ## Usage Example
-
-```language
-// Example code showing how to use the implementation
-```
+{example code}
 
 ## Next Steps
-- Verification items
-- Integration tasks
-- Potential improvements
-
+- Verification items, integration tasks
 <!-- /IMPLEMENTATION_OUTPUT -->
 ```
 
 ### File Output
 
-**Standalone execution:**
-Ask user where to save the summary. Suggest filename:
-- Format: `{prefix}_implementation_output.md`
-- Example: `login_implementation_output.md`
-
-**Workflow integration:**
-Output to the path specified by implementation-workflow.
-
----
-
-## Prefix Handling
-
-Use the same prefix as the design document:
-- If input is `login_design_output.md`, output `login_implementation_output.md`
-- If prefix unclear, ask user to specify
-
----
+- **Standalone**: Suggest `{prefix}_implementation_output.md`（設計書と同じprefix）
+- **Workflow**: Output to the specified path
 
 ## Error Handling During Implementation
-
-If encountering issues:
 
 1. **Design ambiguity**: Ask user for clarification
 2. **Technical constraint**: Propose alternative approach
 3. **Scope creep**: Note as deviation and confirm with user
-
----
-
-## Tips for Effective Implementation
-
-- Implement incrementally, validate each step
-- Keep implementations simple initially, refactor if needed
-- Match design structure in code organization
-- Document deviations immediately
-- Consider testability from the start

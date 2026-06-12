@@ -1,0 +1,112 @@
+---
+name: code-knowledge
+description: |
+  Provide implementation knowledge (coding standards, technical constraints, golden samples) based on project/language keywords.
+  Triggered by 'code-knowledge', 'coding-standards' (legacy), language names (unity, csharp, c#), or requests for coding conventions and technical constraints.
+  Uses knowledge packs with progressive loading: core constraints (always small), golden samples, and detail sections (on demand).
+  Keywords: "コーディング規約", "規約を教えて", "技術制約", "実装知識", "code-knowledge", "coding-standards"
+---
+
+This skill provides implementation knowledge (coding standards, technical constraints, and golden samples) through **knowledge packs** with progressive loading to keep context small.
+
+## Knowledge Pack Structure
+
+Each pack has up to 3 layers. **Never load everything at once** — load only what the current task needs:
+
+| Layer | Content | Size Budget | When to Load |
+|-------|---------|-------------|--------------|
+| **core.md** | Critical constraints with ❌→✅ rewrite pairs, essential style table | ~2KB | **Always** (before writing any code) |
+| **examples/** | Golden samples — small compilable files embodying many rules at once | ~100 lines each | Before implementation (pick the sample matching the code type) |
+| **sections/** | Detailed per-topic rules (naming, error-handling, etc.) | 1-4KB each | **On demand only** — when a specific question arises |
+
+Packs with `"format": "monolithic"` are legacy single-file packs (`standards.md`). Load the whole file for those, and consider migrating them with code-knowledge-creator.
+
+<!-- DYNAMIC_CONTENT_START: 内容はPythonスクリプトにより自動更新されます -->
+## 利用可能なナレッジパック
+
+以下のナレッジパックが利用可能です (最終更新: 2026-06-12, version: 2.0.0)
+
+| キーワード | パック | 形式 | 状態 |
+|-----------|--------|------|------|
+| 'unity', 'unity3d', 'game', 'gamedev' | Unity | structured | OK |
+| 'csharp', 'c#', 'dotnet', '.net', 'cs' | C# Project | monolithic | OK |
+
+## 利用可能なナレッジパック（詳細）
+
+- **Unity**: 'unity', 'unity3d', 'game', 'gamedev' (詳細度: enterprise)
+  - **重要な制約**: LINQ禁止、try-catch例外処理禁止、Task禁止（core.md参照）
+- **C# Project**: 'csharp', 'c#', 'dotnet', '.net', 'cs' (詳細度: enterprise)
+<!-- DYNAMIC_CONTENT_END -->
+
+## Loading Protocol
+
+### For implementation tasks (the common case)
+
+1. Identify the pack from keywords (run `scripts/list_knowledge.py --search <keyword>` if unsure)
+2. Read the pack's `metadata.json` to get file paths and section index
+3. Read `core.md` — these constraints are non-negotiable
+4. Read the golden sample matching what you will write (e.g., MonoBehaviour vs. plain class)
+5. Start implementing. Read a `sections/*.md` file **only when** you hit a question it answers (check section descriptions in metadata.json)
+
+### For "show me the standards" requests
+
+1. Run `scripts/list_knowledge.py` to list available packs
+2. Present core.md content first; offer section list for details
+3. Read specific sections only if the user asks about those topics
+
+### When no pack matches
+
+Offer the user:
+- ① Use an existing pack (list available)
+- ② Create a new pack with the **code-knowledge-creator** skill
+- ③ Proceed with general best practices
+
+## Technical Details
+
+### Component Structure
+
+- `config/knowledge_packs.json`: Pack registry (at plugin root)
+- `scripts/list_knowledge.py`: Pack listing and keyword search
+- `scripts/generate_skill_content.py`: Dynamic SKILL.md content generation
+- `references/<pack>/core.md`: Critical constraints (structured packs)
+- `references/<pack>/examples/`: Golden samples (structured packs)
+- `references/<pack>/sections/`: Detail sections (structured packs)
+- `references/<pack>/standards.md`: Full document (monolithic packs)
+- `references/<pack>/metadata.json`: Pack metadata with section index
+
+### Pack Registry Format
+
+```json
+{
+  "knowledge_packs": {
+    "pack-key": {
+      "display_name": "Display Name",
+      "keywords": ["search", "keywords"],
+      "format": "structured | monolithic",
+      "core_path": "references/pack/core.md",
+      "examples_dir": "references/pack/examples/",
+      "sections_dir": "references/pack/sections/",
+      "metadata_path": "references/pack/metadata.json",
+      "status": "available | planned | deprecated",
+      "priority": 1,
+      "detail_level": "basic | detailed | enterprise"
+    }
+  }
+}
+```
+
+### Error Handling
+
+- Python script execution failure: read `config/knowledge_packs.json` directly
+- Config file load failure: glob `references/*/metadata.json` as fallback
+- Referenced file missing: report which file and suggest code-knowledge-creator for repair
+
+## Updating the Skill
+
+After adding or updating knowledge packs, refresh the dynamic content section:
+
+```bash
+python scripts/generate_skill_content.py update
+```
+
+This updates only the content between `<!-- DYNAMIC_CONTENT_START -->` and `<!-- DYNAMIC_CONTENT_END -->` markers, preserving manual edits elsewhere.

@@ -1,6 +1,7 @@
 {
   "name": "dev-workflow",
-  "description": "開発ワークフロー管理プラグイン。設計→実装→検証の統合ワークフロー、コーディング規約管理、進捗追跡を提供します。",
-  "version": "1.2.0",
-  "skills": "./skills/"
+  "description": "開発ワークフロー管理プラグイン。設計→実装→検証→レビューの統合ワークフロー（相談はメインスレッド、実装・検証・レビューは自律agent）、ナレッジパックによる実装知識管理（code-knowledge）を提供します。",
+  "version": "2.0.0",
+  "skills": "./skills/",
+  "agents": "./agents/"
 }

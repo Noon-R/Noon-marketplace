@@ -5,14 +5,12 @@ description: |
   Use when user wants to discuss, plan, or refine a design before implementation.
   Triggers include "設計を相談したい", "この機能の設計を考えたい", "どう実装すべきか", "design discussion", "設計議論",
   or when starting a new implementation task that requires architectural decisions.
-  Supports standalone execution or as part of implementation-workflow.
+  Supports standalone execution or as part of implementation-workflow. Runs interactively in the main thread.
 ---
 
-Structured design discussion workflow for implementation tasks. Helps users clarify requirements, explore design options, and produce a design document ready for implementation.
+Structured design discussion workflow for implementation tasks. Helps users clarify requirements, explore design options, and produce a design document ready for implementation (by the implementer agent or manual coding).
 
 ## Workflow Overview
-
-Three-stage process:
 
 1. **Requirements Clarification**: Understand the implementation requirements
 2. **Design Exploration**: Explore and evaluate design options
@@ -20,21 +18,9 @@ Three-stage process:
 
 ## Input Modes
 
-This skill supports multiple input modes for flexibility:
-
-### Mode 1: Direct Input
-
-User provides requirements directly in chat. Ask clarifying questions as needed.
-
-### Mode 2: File Reference
-
-User provides a file path containing requirements or specifications.
-- Read the file and summarize understanding
-- Ask clarifying questions about unclear points
-
-### Mode 3: Workflow Integration
-
-When called from implementation-workflow, receive requirements from the workflow context.
+- **Direct Input**: User provides requirements in chat
+- **File Reference**: User provides a file path; read and summarize understanding
+- **Workflow Integration**: Called from implementation-workflow with requirements from workflow context
 
 ---
 
@@ -44,112 +30,36 @@ When called from implementation-workflow, receive requirements from the workflow
 
 ### Initial Questions
 
-Ask these core questions:
-
 1. What is the main functionality to implement?
 2. What is the expected input/output?
 3. Are there existing codebases or patterns to follow?
 4. What are the constraints? (language, framework, performance, etc.)
 5. What are the success criteria?
 
-Allow shorthand answers. Encourage context dumping - user can provide related docs, code snippets, or discussions.
+Allow shorthand answers. Encourage context dumping — related docs, code snippets, or discussions.
 
-### Coding Standards Selection
+### Knowledge Pack Selection
 
-**Retrieve available standards from coding-standards skill:**
+実装時にimplementer agentがロードするナレッジパックをここで決定する。
 
-```
-# Check available standards
-coding-standards
+1. **一覧取得**: code-knowledgeスキルの `scripts/list_knowledge.py` で利用可能なパックを取得し、ユーザーに提示
+2. **選択**: プロジェクトに合うパックをユーザーが選択（複数可）
+3. **制約の先取り**: 選択パックの `core.md` を読み、**致命的制約（例: Unity = LINQ禁止・try-catch禁止）を設計判断に反映**する。詳細セクションはこの段階では読まない
 
-# Example output:
-## Available Coding Standards
-
-| Keywords | Language/Standard | File | Status |
-|----------|------------------|------|--------|
-| unity, unity3d, game | Unity | references/unity/standards.md | ✓ |
-| csharp, c#, dotnet | C# Project | references/csharp-project/standards.md | ✓ |
-
-Please select coding standards to use for this implementation.
-Multiple selections allowed (e.g., "unity, csharp").
-```
-
-**Validate and retrieve standards:**
-
-Validate user's selected standards with coding-standards skill:
+**該当パックがない場合:**
 
 ```
-# Get specific standards
-coding-standards <selected_keywords>
+⚠ 該当するナレッジパックが見つかりません。
 
-# Examples:
-coding-standards unity       # Get Unity standards
-coding-standards csharp      # Get C# Project standards
+① 既存パックから選ぶ
+② code-knowledge-creator スキルで新規パックを作成する（推奨: 制約が明確なプロジェクトの場合）
+③ 一般的なベストプラクティスで進める
 ```
 
-**When standards not found:**
-
-```
-⚠ Specified standards not found.
-
-Please choose:
-① Use existing standards (check with coding-standards)
-② Create new standards (use coding-standards-creator skill)
-③ Proceed with general guidelines
-```
-
-Display warning:
-
-```
-⚠ {Standard} standards are not yet implemented.
-```
-
-Handle user choice:
-- **① Use existing:** Ask user to select from available standards
-- **② Create new:** Launch new standard creation wizard (see below)
-- **③ Skip:** Proceed without coding standards (will use generic checks in code-review)
-
-**New Standard Creation Wizard:**
-
-If user chooses to create new standard:
-
-1. **Explain template structure:**
-
-```
-新しいコーディング規約テンプレートを作成します。
-
-基本セクション:
-- Naming conventions
-- File structure
-- Indentation and formatting rules
-
-詳細セクション:
-- Comments and documentation rules
-- Error handling patterns
-- Best practices and anti-patterns
-- Language-specific features usage
-- Code review checklist
-```
-
-2. **Guide user through sections:**
-   - Ask for naming conventions (classes, methods, variables, etc.)
-   - Ask for formatting rules (indentation, line length, etc.)
-   - Ask for any critical rules or prohibited patterns
-   - Ask for code examples (optional but recommended)
-
-3. **Generate standard file:**
-   - Create `coding-standards/references/{standard}.md` with user input
-   - Follow same structure as existing standards
-   - Include code examples in appropriate language syntax
-
-4. **Confirm and continue:**
-   - Show generated file path
-   - Ask user to review
-   - Continue with design discussion using new standard
+②を選んだ場合はcode-knowledge-creatorスキルに移行し、パック作成後に設計議論へ戻る。
 
 ### Clarifying Questions
 
-After initial context:
 - Generate 5-10 numbered questions about unclear points
 - Focus on edge cases, error handling, integration points
 - Ask about non-functional requirements (performance, maintainability)
@@ -164,49 +74,27 @@ After initial context:
 
 ### Design Options
 
-Based on requirements, propose 2-4 design approaches:
-
-For each option, outline:
-- **Approach**: Brief description
-- **Pros**: Benefits of this approach
-- **Cons**: Drawbacks or risks
-- **Fit**: How well it matches the constraints
-
-Ask user to evaluate options or provide preferences.
+Propose 2-4 design approaches. For each: **Approach** / **Pros** / **Cons** / **Fit**（ナレッジパックの制約との整合を含む）. Ask user to evaluate.
 
 ### Decision Points
 
-For key architectural decisions:
+For key architectural decisions: list the decision → present options with trade-offs → get user input → document decision and rationale.
 
-1. List the decision to make
-2. Present options with trade-offs
-3. Get user input
-4. Document the decision and rationale
-
-Common decision points:
-- Module/class structure
-- Data flow and state management
-- Error handling strategy
-- Interface design
-- Dependency management
+Common decision points: module/class structure, data flow and state management, error handling strategy（パックの制約に従う）, interface design, dependency management.
 
 ### Refinement
 
-Iterate on the chosen approach:
-- Drill down into specific components
-- Clarify interfaces between modules
-- Address edge cases
-- Consider testing strategy
+Drill down into components, clarify interfaces, address edge cases, consider testing strategy.
 
 ---
 
 ## Stage 3: Design Documentation
 
-**Goal:** Produce a structured design document for implementation.
+**Goal:** Produce a design document that the implementer agent can execute autonomously.
+
+設計書は**implementer agentが対話なしで実装できる粒度**で書く。曖昧さはOpen Questionsとして明示する。
 
 ### Output Format
-
-Generate a design document with the following structure:
 
 ```markdown
 <!-- DESIGN_OUTPUT -->
@@ -219,85 +107,54 @@ Brief description of what will be implemented.
 - Functional requirements (numbered list)
 - Non-functional requirements
 
-## Coding Standards
-- Applied standards: {selected standards with links}
-- Reference: See [coding-standards](../coding-standards/SKILL.md) skill
+## Knowledge Pack
+- Pack: {pack key（例: unity）}    ← implementer agentがこのキーでcore.md等をロードする
+- 設計に影響した制約: {例: try-catch禁止のためResult型でエラー伝搬}
 
 ## Architecture
 
 ### Class Diagram
-
 ```mermaid
 classDiagram
     class ClassName {
         +publicMethod()
-        -privateMethod()
-        +publicProperty
-        -privateProperty
     }
-    class AnotherClass {
-    }
-    ClassName --> AnotherClass : relationship
 ```
 
 ### Module Structure
-- Module/class breakdown
-- Responsibilities of each component
+- Module/class breakdown and responsibilities
 
 ### Data Flow
-- Input → Processing → Output flow
-- State management approach
+- Input → Processing → Output flow, state management
 
 ### Interfaces
-- Public APIs/methods
-- Input/output specifications
+- Public APIs/methods, input/output specifications
 
 ## Design Decisions
-
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| ... | ... | ... |
 
 ## Implementation Notes
-- Specific patterns to follow
-- Libraries/dependencies to use
-- Known constraints or gotchas
-- **Coding standards reference**: {link to applicable standards}
+- Specific patterns to follow, libraries/dependencies, known constraints
+- Target directory for implementation
 
 ## Testing Strategy
-- Unit test approach
-- Integration test considerations
-- Edge cases to cover
+- Unit test approach, integration considerations, edge cases
 
 ## Open Questions
-- Items requiring further clarification during implementation
-
+- Items requiring clarification during implementation
 <!-- /DESIGN_OUTPUT -->
 ```
 
 ### File Output
 
-**Standalone execution:**
-Ask user where to save the output file. Suggest a filename based on the feature name:
-- Format: `{prefix}_design_output.md`
-- Example: `login_design_output.md`
-
-**Workflow integration:**
-Output to the path specified by implementation-workflow.
-
-## Prefix Extraction
-
-When creating output files, extract a prefix from the feature/requirement description:
-
-1. Identify the main noun or concept (e.g., "ログイン機能の実装" → 'login', "検索API" → 'search_api')
-2. Convert to lowercase, replace spaces with underscores
-3. Use ASCII-safe characters only
-4. If unclear, ask user to specify a short prefix
+- **Standalone**: Suggest `{prefix}_design_output.md`（prefix = 主要概念の小文字ASCII。不明ならユーザーに確認）
+- **Workflow integration**: Output to the path specified by implementation-workflow
 
 ## Tips for Effective Design Discussion
 
 - Start broad, then narrow down
 - Make implicit assumptions explicit
-- Consider future extensibility
 - Balance between over-design and under-design
 - Document "why" not just "what"
+- パックの致命的制約は設計段階で織り込む（実装段階での手戻りを防ぐ）

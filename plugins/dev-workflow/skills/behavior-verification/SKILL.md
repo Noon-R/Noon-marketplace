@@ -4,8 +4,8 @@ description: |
   Generate verification checklists for implemented code and guide user through testing.
   Use when user wants to verify implementation, test code behavior, or when proceeding from implementation stage.
   Triggers include "動作確認したい", "テストして", "verify this", "検証を実施して",
-  or when implementation-workflow transitions to verification stage.
   Produces structured checklist and waits for user confirmation.
+  Note: implementation-workflow uses the verifier agent for this stage; this skill is for standalone interactive use.
 ---
 
 Generate verification checklists for implemented code. Guides user through testing and collects confirmation before proceeding.

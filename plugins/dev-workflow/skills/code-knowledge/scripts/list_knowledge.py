@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-List available coding standards and search by keywords.
+List available knowledge packs and search by keywords.
 
 Usage:
-    python list_standards.py                    # List all standards
-    python list_standards.py --search "unity"   # Search by keyword
-    python list_standards.py --json             # Output as JSON
+    python list_knowledge.py                    # List all packs
+    python list_knowledge.py --search "unity"   # Search by keyword
+    python list_knowledge.py --json             # Output as JSON
 """
 
 import argparse
@@ -22,15 +22,15 @@ if sys.platform == 'win32':
 
 
 def get_config_path():
-    """Get the path to language_packs.json config file."""
+    """Get the path to knowledge_packs.json config file."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Navigate up to skills/coding-standards, then to plugin root config
-    config_path = os.path.join(script_dir, '..', '..', '..', 'config', 'language_packs.json')
+    # Navigate up to skills/code-knowledge, then to plugin root config
+    config_path = os.path.join(script_dir, '..', '..', '..', 'config', 'knowledge_packs.json')
     return os.path.normpath(config_path)
 
 
-def load_language_packs():
-    """Load language packs configuration."""
+def load_knowledge_packs():
+    """Load knowledge packs configuration."""
     config_path = get_config_path()
 
     if not os.path.exists(config_path):
@@ -40,7 +40,7 @@ def load_language_packs():
     try:
         with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
-            return config.get('language_packs', {})
+            return config.get('knowledge_packs', {})
     except json.JSONDecodeError as e:
         print(f"Error: Invalid JSON in config file: {e}", file=sys.stderr)
         return {}
@@ -49,30 +49,38 @@ def load_language_packs():
         return {}
 
 
-def list_all_standards(as_json=False):
-    """List all available coding standards."""
-    packs = load_language_packs()
+def pack_entry_path(pack):
+    """Get the primary entry path for a pack (core.md for structured, standards.md for monolithic)."""
+    if pack.get('format') == 'structured':
+        return pack.get('core_path', 'N/A')
+    return pack.get('file_path', 'N/A')
+
+
+def list_all_packs(as_json=False):
+    """List all available knowledge packs."""
+    packs = load_knowledge_packs()
 
     if as_json:
         print(json.dumps(packs, ensure_ascii=False, indent=2))
         return
 
     if not packs:
-        print("No language packs found.")
+        print("No knowledge packs found.")
         return
 
-    print("## Available Coding Standards\n")
-    print("| Keywords | Language/Standard | File | Status |")
-    print("|----------|------------------|------|--------|")
+    print("## Available Knowledge Packs\n")
+    print("| Keywords | Pack | Format | Entry File | Status |")
+    print("|----------|------|--------|------------|--------|")
 
     for key, pack in sorted(packs.items(), key=lambda x: x[1].get('priority', 999)):
         keywords = "'" + "', '".join(pack.get('keywords', [])) + "'"
         display_name = pack.get('display_name', key)
-        file_path = pack.get('file_path', 'N/A')
+        pack_format = pack.get('format', 'monolithic')
+        entry = pack_entry_path(pack)
         status = pack.get('status', 'unknown')
         status_symbol = '✓' if status == 'available' else '○' if status == 'planned' else '✗'
 
-        print(f"| {keywords} | {display_name} | [{file_path}]({file_path}) | {status_symbol} |")
+        print(f"| {keywords} | {display_name} | {pack_format} | [{entry}]({entry}) | {status_symbol} |")
 
     print("\n## Detail Levels")
     for key, pack in sorted(packs.items(), key=lambda x: x[1].get('priority', 999)):
@@ -82,9 +90,9 @@ def list_all_standards(as_json=False):
         print(f"- **{display_name}**: {keywords} (詳細度: {detail_level})")
 
 
-def search_standards(keyword):
-    """Search for standards matching a keyword."""
-    packs = load_language_packs()
+def search_packs(keyword):
+    """Search for knowledge packs matching a keyword."""
+    packs = load_knowledge_packs()
     keyword_lower = keyword.lower()
 
     matches = []
@@ -94,38 +102,40 @@ def search_standards(keyword):
             matches.append({
                 'key': key,
                 'display_name': pack.get('display_name', key),
-                'file_path': pack.get('file_path'),
+                'format': pack.get('format', 'monolithic'),
+                'entry_path': pack_entry_path(pack),
+                'metadata_path': pack.get('metadata_path'),
                 'status': pack.get('status', 'unknown'),
                 'priority': pack.get('priority', 999),
                 'detail_level': pack.get('detail_level', 'basic')
             })
 
-    # Sort by priority
     matches.sort(key=lambda x: x['priority'])
 
     if not matches:
-        print(f"No standards found matching '{keyword}'")
+        print(f"No knowledge packs found matching '{keyword}'")
         return
 
-    print(f"## Standards matching '{keyword}'\n")
+    print(f"## Knowledge packs matching '{keyword}'\n")
     for match in matches:
         status_symbol = '✓' if match['status'] == 'available' else '○'
-        print(f"- **{match['display_name']}** [{status_symbol}]")
-        print(f"  - File: {match['file_path']}")
+        print(f"- **{match['display_name']}** [{status_symbol}] (format: {match['format']})")
+        print(f"  - Entry: {match['entry_path']}")
+        print(f"  - Metadata: {match['metadata_path']}")
         print(f"  - Detail Level: {match['detail_level']}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='List and search coding standards')
+    parser = argparse.ArgumentParser(description='List and search knowledge packs')
     parser.add_argument('--search', '-s', type=str, help='Search by keyword')
     parser.add_argument('--json', '-j', action='store_true', help='Output as JSON')
 
     args = parser.parse_args()
 
     if args.search:
-        search_standards(args.search)
+        search_packs(args.search)
     else:
-        list_all_standards(as_json=args.json)
+        list_all_packs(as_json=args.json)
 
 
 if __name__ == '__main__':
