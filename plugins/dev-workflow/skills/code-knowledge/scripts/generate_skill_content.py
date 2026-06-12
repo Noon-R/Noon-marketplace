@@ -73,9 +73,9 @@ def load_pack_constraints(pack):
 
 
 CONSTRAINT_LABELS = {
-    'linq_prohibited': 'LINQ禁止',
-    'try_catch_prohibited': 'try-catch例外処理禁止',
-    'task_prohibited': 'Task禁止'
+    'linq_prohibited': 'No LINQ',
+    'try_catch_prohibited': 'No try-catch exceptions',
+    'task_prohibited': 'No Task (use coroutine/UniTask)'
 }
 
 
@@ -86,10 +86,10 @@ def generate_dynamic_content(config):
     last_updated = config.get('last_updated', datetime.now().strftime('%Y-%m-%d'))
 
     lines = []
-    lines.append(f"\n## 利用可能なナレッジパック\n")
-    lines.append(f"以下のナレッジパックが利用可能です (最終更新: {last_updated}, version: {version})\n")
-    lines.append("| キーワード | パック | 形式 | 状態 |")
-    lines.append("|-----------|--------|------|------|")
+    lines.append(f"\n## Available Knowledge Packs\n")
+    lines.append(f"Last updated: {last_updated}, version: {version}\n")
+    lines.append("| Keywords | Pack | Format | Status |")
+    lines.append("|----------|------|--------|--------|")
 
     for key, pack in sorted(packs.items(), key=lambda x: x[1].get('priority', 999)):
         keywords = "'" + "', '".join(pack.get('keywords', [])) + "'"
@@ -100,19 +100,19 @@ def generate_dynamic_content(config):
 
         lines.append(f"| {keywords} | {display_name} | {pack_format} | {status_text} |")
 
-    lines.append("\n## 利用可能なナレッジパック（詳細）\n")
+    lines.append("\n## Pack Details\n")
 
     for key, pack in sorted(packs.items(), key=lambda x: x[1].get('priority', 999)):
         display_name = pack.get('display_name', key)
         keywords = "'" + "', '".join(pack.get('keywords', [])) + "'"
         detail_level = pack.get('detail_level', 'basic')
 
-        lines.append(f"- **{display_name}**: {keywords} (詳細度: {detail_level})")
+        lines.append(f"- **{display_name}**: {keywords} (detail level: {detail_level})")
 
         constraints = load_pack_constraints(pack)
         labels = [CONSTRAINT_LABELS.get(k, k) for k, v in constraints.items() if v]
         if labels:
-            lines.append(f"  - **重要な制約**: {'、'.join(labels)}（core.md参照）")
+            lines.append(f"  - **Critical constraints**: {', '.join(labels)} (see core.md)")
 
     lines.append("")
 

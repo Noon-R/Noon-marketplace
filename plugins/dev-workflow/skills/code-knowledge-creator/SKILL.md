@@ -10,39 +10,39 @@ description: |
 
 ## Overview
 
-code-knowledgeスキル用のナレッジパック（コーディング規約・技術制約・模範サンプル）を作成・更新するスキル。**良いパックは「量」ではなく「ロード効率と遵守率」で決まる**。以下の設計原則（勘所）に必ず従って作成する。
+Creates and updates knowledge packs (coding standards, technical constraints, golden samples) for the code-knowledge skill. **A good pack is measured by load efficiency and compliance rate, not volume.** Always follow the design principles below. Communicate with the user in Japanese.
 
 ---
 
-## 設計原則（勘所）— パック作成前に必ず読む
+## Design Principles — read before creating any pack
 
-### 原則1: 3層構造と分離基準
+### Principle 1: Three layers, separated by load timing
 
-知識は「いつロードされるか」で3層に分ける。**全部入りの1ファイルを作ってはならない**（コンテキストを圧迫し、肝心の制約が埋もれて遵守率が下がる）。
+Split knowledge by **when it gets loaded**. Never create an all-in-one file (it bloats context and buries the critical constraints, lowering compliance).
 
-| 層 | 内容 | サイズ予算 | ロードタイミング |
-|----|------|-----------|----------------|
-| **core.md** | 致命的制約 + 必須スタイル要点 | **~2KB厳守** | 常時（実装agentに注入） |
-| **examples/** | ゴールデンサンプル | 1ファイル~100行 | 実装開始前 |
-| **sections/** | トピック別詳細規約 | 各1-4KB | 疑問が生じたときだけ |
+| Layer | Content | Size budget | Load timing |
+|-------|---------|-------------|-------------|
+| **core.md** | Critical constraints + essential style table | **~2KB strict** | Always (injected into implementation agents) |
+| **examples/** | Golden samples | ~100 lines per file | Before implementation |
+| **sections/** | Per-topic detail rules | 1-4KB each | Only when a question arises |
 
-**分離の判断基準:**
-- 「違反したら即リジェクト」レベルの制約 → core.md
-- 「迷ったときに参照する」詳細・背景・パターン集 → sections/
-- 「文章で説明するより見せたほうが早い」流儀 → examples/
+**Separation criteria:**
+- "Violation = immediate reject" constraints → core.md
+- Details, background, pattern collections consulted when unsure → sections/
+- Conventions faster to show than to explain → examples/
 
-### 原則2: LLMが言われなくても守ることは書かない
+### Principle 2: Don't write what an LLM already does unprompted
 
-Claudeは「意味のある変数名を付ける」「単一責任にする」を指示なしでも概ね守る。そういう一般論はcore.mdに入れない。**書く価値があるのは、デフォルト挙動と違うことだけ**:
+Claude already uses meaningful names and single-responsibility design without being told. Generic advice does not belong in core.md. **Only write what differs from default behavior:**
 
-- ✅ 書く価値が高い: 「LINQ禁止」「try-catch禁止」「privateフィールドは`_PascalCase`」（Claudeのデフォルトは`_camelCase`）「enum値はSNAKE_CASE」
-- ❌ 書く価値が低い: 「クラスはPascalCase」「メソッドは動詞で始める」「意味のある名前を付ける」
+- ✅ Worth writing: "No LINQ", "No try-catch", "private fields are `_PascalCase`" (Claude defaults to `_camelCase`), "enum values are SNAKE_CASE"
+- ❌ Not worth writing: "Classes are PascalCase", "Methods start with verbs", "Use meaningful names"
 
-ユーザーへのヒアリングでも「一般的なC#/言語標準と**違うところはどこですか**」を最優先で聞く。
+When interviewing the user, the top question is: **"Where do your rules differ from the standard conventions of this language?"**
 
-### 原則3: 禁止事項は必ず ❌/✅ 対訳にする
+### Principle 3: Prohibitions always come as ❌/✅ rewrite pairs
 
-禁止形だけ示しても、代替手段がわからなければ破られる。core.mdの致命的制約には必ず**書き換え対**（5〜10行）を付ける:
+A prohibition without an alternative gets violated. Every critical constraint in core.md must include a **rewrite pair** (5-10 lines):
 
 ```csharp
 // ❌ var actives = users.Where(u => u.IsActive).ToList();
@@ -54,39 +54,39 @@ foreach (User user in users)
 }
 ```
 
-### 原則4: ゴールデンサンプルは「規約の交差点」として設計する
+### Principle 4: Design golden samples as "intersections of rules"
 
-ルール別の細切れスニペットを大量に作るのではなく、**1ファイルで多数の規約を同時に体現する完成形コード**を作る。トークン効率が圧倒的に高く、LLMはルール散文よりコードの模倣に強く従う。
+Instead of many per-rule snippets, create **one complete code file that embodies many rules at once**. Token efficiency is far higher, and LLMs imitate code more reliably than they follow rule prose.
 
-- **1ドメイン1ファイル**: コードの種類ごとに分ける（例: Unity = 一般クラス用 + MonoBehaviour用）
-- **~100行以内**: 長いサンプルは読まれないし模倣の焦点がぼける
-- **実コンパイル可能**: 疑似コードは禁止。質の低いサンプルはルール散文より害が大きい（悪い癖ごと模倣される）
-- **冒頭コメントで体現規約を列挙**: 「このファイルが何の見本か」を明示する
-- **設計時の確認**: 命名・構成順序・エラー処理・禁止事項の代替が1ファイルに全部現れているかをチェックリスト的に確認する
+- **One file per code domain** (e.g., Unity = one for plain classes + one for MonoBehaviour)
+- **~100 lines max**: longer samples don't get read and blur the imitation focus
+- **Must actually compile**: no pseudocode. A low-quality sample is worse than rule prose (bad habits get imitated too)
+- **Header comment lists the embodied rules**: make explicit what the file is a model of
+- **Design check**: verify naming, member ordering, error handling, and prohibition alternatives all appear in the one file
 
-参照実装: `code-knowledge/references/unity/examples/golden_service.cs`
+Reference implementation: `code-knowledge/references/unity/examples/golden_service.cs`
 
-### 原則5: sections/は索引で引けるようにする
+### Principle 5: Make sections/ discoverable via the index
 
-各セクションはmetadata.jsonの`sections`に**1行のdescription付き**で登録する。実装agentはdescriptionだけを見て「読むかどうか」を判断するため、descriptionには中身が推測できる具体語を入れる（「エラー処理の詳細」ではなく「try-catch禁止の詳細、Result<T>パターン、TryPattern、入力検証」）。
+Register each section in metadata.json's `sections` with a **one-line description**. Implementation agents decide whether to read a section from the description alone, so use concrete terms that reveal the content (not "error handling details" but "no-try-catch details, Result<T> pattern, TryPattern, input validation").
 
 ---
 
 ## Workflow: Create New Knowledge Pack
 
-### Step 1: Gather Sample Code（推奨）
+### Step 1: Gather Sample Code (recommended)
 
-ユーザーの既存コード・プロジェクトがあれば読み、以下を抽出する:
+If the user has existing code, read it and extract:
 
-- **デフォルトと違う規約**（原則2の観点で。これがcore.md候補）
-- 命名・構成パターン（ゴールデンサンプルの素材）
-- 禁止されているAPI・パターン（❌/✅対訳の素材）
+- **Rules that differ from defaults** (per Principle 2 — these are core.md candidates)
+- Naming/structure patterns (material for golden samples)
+- Prohibited APIs/patterns (material for ❌/✅ pairs)
 
-サンプルがなければ言語標準（C#ならMicrosoftガイドライン等）を出発点に、「標準と変えたいところ」をヒアリングする。
+Without samples, start from the language standard (e.g., Microsoft guidelines for C#) and interview for "where do you deviate from the standard".
 
 ### Step 2: Define Pack
 
-- Pack key（例: "unity"）、display name、対象フレームワーク、検索keywords
+- Pack key (e.g., "unity"), display name, target frameworks, search keywords
 
 ### Step 3: Scaffold
 
@@ -94,74 +94,74 @@ foreach (User user in users)
 python scripts/knowledge_pack_creator.py create <pack_key> --name "Display Name" --keywords kw1 kw2
 ```
 
-`core.md` + `sections/`（雛形5種: naming, formatting, class-design, error-handling, testing）+ `examples/`（空）+ `metadata.json` が生成される。
+Generates `core.md` + `sections/` (5 starter files: naming, formatting, class-design, error-handling, testing) + `examples/` (empty) + `metadata.json`.
 
-### Step 4: Write core.md（最重要・原則2,3を適用）
+### Step 4: Write core.md (most important — apply Principles 2 & 3)
 
-1. 致命的制約を❌/✅対訳で記述（通常3〜6個。10個を超えるなら本当に致命的か見直す）
-2. 必須スタイル要点を表形式で（デフォルトと違うものだけ）
-3. **2KB以内に収める**。超えたら詳細をsections/へ移す
+1. Write critical constraints as ❌/✅ pairs (usually 3-6; if over 10, reconsider whether they are truly critical)
+2. Essential style table (only what differs from defaults)
+3. **Keep under 2KB.** Move overflow to sections/
 
-### Step 5: Create Golden Samples（原則4を適用）
+### Step 5: Create Golden Samples (apply Principle 4)
 
-1. コードドメインを特定（例: サービスクラス / UIコンポーネント / テスト）
-2. ドメインごとに~100行の完成形コードを書く
-3. ユーザーにレビューしてもらう（「このコードがそのまま増殖してよいか?」）
-4. metadata.jsonの`examples`にdescription付きで登録
+1. Identify code domains (e.g., service class / UI component / test)
+2. Write one ~100-line complete file per domain
+3. Have the user review it ("Is this code OK to multiply across the codebase as-is?")
+4. Register in metadata.json `examples` with descriptions
 
-### Step 6: Write sections/（原則5を適用)
+### Step 6: Write sections/ (apply Principle 5)
 
-詳細規約をトピック別に記述。不要な雛形は削除。各セクションをmetadata.jsonに具体的なdescription付きで登録。
+Write detail rules per topic. Delete unused starter files. Register each section in metadata.json with a concrete description.
 
 ### Step 7: Register & Validate
 
-1. `config/knowledge_packs.json` に登録（`"format": "structured"`）
-2. 検証: `python scripts/knowledge_pack_creator.py validate <pack_key>`
-   - core.mdのサイズ超過・❌/✅対訳の欠落・examples未登録を警告する
-3. `code-knowledge/scripts/generate_skill_content.py update` でSKILL.mdの動的セクションを更新
-4. code-knowledgeスキルで新パックが引けることを確認
+1. Register in `config/knowledge_packs.json` (`"format": "structured"`)
+2. Validate: `python scripts/knowledge_pack_creator.py validate <pack_key>`
+   - Warns on core.md size overrun, missing ❌/✅ pairs, unregistered examples
+3. Run `code-knowledge/scripts/generate_skill_content.py update` to refresh the dynamic SKILL.md section
+4. Confirm the new pack resolves via the code-knowledge skill
 
 ---
 
 ## Workflow: Migrate Monolithic Pack to Structured
 
-旧形式（standards.md一枚岩）のパックを3層構造に移行する:
+To migrate a legacy single-file pack (standards.md) to the 3-layer structure:
 
-1. standards.mdを読み、**致命的制約**（🔴 CRITICAL相当）を抽出 → core.mdへ（❌/✅対訳に整形）
-2. 散在するコード例を**ゴールデンサンプルに統合・蒸留** → examples/へ
-3. 残りの詳細をトピック別に分割 → sections/へ（関連する章は1ファイルにまとめてよい）
-4. metadata.jsonを`"format": "structured"`に書き換え、sections索引とexamplesを登録
-5. standards.mdを削除し、knowledge_packs.jsonを更新
-6. validateと動的コンテンツ更新を実行
+1. Read standards.md and extract **critical constraints** (🔴 CRITICAL level) → core.md (reformat as ❌/✅ pairs)
+2. **Consolidate and distill** scattered code examples into golden samples → examples/
+3. Split remaining detail by topic → sections/ (related chapters may share one file)
+4. Rewrite metadata.json with `"format": "structured"`, the sections index, and examples
+5. Delete standards.md and update knowledge_packs.json
+6. Run validate and the dynamic content update
 
-参照例: unityパックの移行（15章 → core.md + 2サンプル + 10セクション）
+Reference example: the unity pack migration (15 chapters → core.md + 2 samples + 10 sections)
 
 ---
 
 ## Workflow: Update Existing Pack
 
-1. **更新種別の特定**: 制約追加/緩和、セクション加筆、サンプル更新、誤り修正
-2. **更新先の判断（原則1の分離基準で）**:
-   - 新しい禁止事項 → core.md（対訳付き）+ 必要ならsections/に詳細
-   - 詳細パターンの追加 → sections/のみ
-   - 流儀の変更 → **ゴールデンサンプルも必ず更新**（サンプルと規約の矛盾は最悪の状態。LLMはサンプルに従う）
-3. metadata.jsonの`version`と`last_updated`を更新
-4. validate実行 → 動的コンテンツ更新
+1. **Identify update type**: constraint add/relax, section addition, sample update, error fix
+2. **Decide the target layer (Principle 1 separation criteria):**
+   - New prohibition → core.md (with rewrite pair) + sections/ detail if needed
+   - Additional detail patterns → sections/ only
+   - Convention change → **always update the golden samples too** (sample-vs-rule contradiction is the worst state; LLMs follow the sample)
+3. Update metadata.json `version` and `last_updated`
+4. Run validate → dynamic content update
 
 ---
 
 ## Quality Checklist
 
-パック完成時に確認:
+On pack completion, verify:
 
-- [ ] core.mdは2KB以内か
-- [ ] 致命的制約すべてに❌/✅対訳があるか
-- [ ] core.mdに「LLMが言われなくても守る一般論」が混ざっていないか
-- [ ] ゴールデンサンプルはコンパイル可能か（可能ならビルドで確認）
-- [ ] サンプルがcore.md・sections/の規約と矛盾していないか
-- [ ] metadata.jsonのsections descriptionは具体的か（中身が推測できるか)
-- [ ] knowledge_packs.jsonに登録され、動的コンテンツが更新されているか
+- [ ] core.md is under 2KB
+- [ ] Every critical constraint has a ❌/✅ pair
+- [ ] core.md contains no generic advice an LLM follows unprompted
+- [ ] Golden samples compile (build to confirm if possible)
+- [ ] Samples do not contradict core.md / sections/
+- [ ] metadata.json section descriptions are concrete (content guessable)
+- [ ] Registered in knowledge_packs.json and dynamic content refreshed
 
 ## Implementation Details
 
-- `scripts/knowledge_pack_creator.py`: scaffold生成・構造検証ユーティリティ（structured/monolithic両対応）
+- `scripts/knowledge_pack_creator.py`: scaffold generation and structure validation (supports structured/monolithic)

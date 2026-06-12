@@ -7,9 +7,9 @@ description: |
   Reads design from file or direct input, loads the knowledge pack progressively, produces working code.
 ---
 
-Execute implementation based on design documents, interactively in the main thread.
+Execute implementation based on design documents, interactively in the main thread. Communicate with the user in Japanese.
 
-> **Note:** implementation-workflowから呼ばれる場合は、このスキルではなく**implementer agent**が使われる。このスキルはスタンドアロンで対話的に実装したいケース向け。
+> **Note:** When called from implementation-workflow, the **implementer agent** is used instead of this skill. This skill is for standalone, interactive implementation.
 
 ## Workflow Overview
 
@@ -31,21 +31,21 @@ Execute implementation based on design documents, interactively in the main thre
 
 Check the design document contains: module/class structure, interface definitions, data flow, design decisions, knowledge pack specification. If missing critical information, ask clarifying questions before proceeding.
 
-### Load Knowledge Pack（段階ロード）
+### Load Knowledge Pack (progressive)
 
-設計書の「Knowledge Pack」セクションのパックキーを使い、code-knowledgeスキルの構造からロードする:
+Using the pack key from the design doc's "Knowledge Pack" section, load from the code-knowledge skill structure:
 
-1. `references/{pack}/metadata.json` — ファイルパスとセクション索引
-2. `references/{pack}/core.md` — **絶対遵守の制約**
-3. 書くコードの種類に合うゴールデンサンプル（`examples/`）
+1. `references/{pack}/metadata.json` — file paths and section index
+2. `references/{pack}/core.md` — **non-negotiable constraints**
+3. The golden sample matching the code type (`examples/`)
 
-詳細セクション（`sections/*.md`）は**実装中に疑問が生じたときだけ**読む。全文の先読みはしない。
+Read detail sections (`sections/*.md`) **only when a question arises during implementation**. Never preload everything.
 
-パック指定が設計書にない場合: `scripts/list_knowledge.py` で一覧を提示し、ユーザーに選択を求める。該当なしなら一般的なベストプラクティスで進める。
+If the design doc specifies no pack: list packs via `scripts/list_knowledge.py` and ask the user to choose. If none fits, proceed with general best practices.
 
 ### Pre-Implementation Checklist
 
-Confirm with user: target directory / language・framework (if not in design) / knowledge pack / existing files to integrate with.
+Confirm with user: target directory / language & framework (if not in design) / knowledge pack / existing files to integrate with.
 
 ---
 
@@ -54,12 +54,12 @@ Confirm with user: target directory / language・framework (if not in design) / 
 1. **Start with structure**: File/folder structure first
 2. **Core interfaces**: Public interfaces/APIs
 3. **Internal logic**: Implementation details
-4. **Error handling**: core.mdの流儀に従う（例: Unityなら例外でなく戻り値）
+4. **Error handling**: Follow core.md conventions (e.g., return values instead of exceptions for Unity)
 5. **Integration points**: Connect with existing code
 
-迷ったらゴールデンサンプルの書き方に合わせる。設計との乖離は逐次記録する。
+When in doubt, imitate the golden sample. Record design deviations as you go.
 
-**General defaults**（パックがない場合）: clear naming, single responsibility, minimal comments, explicit error handling, idiomatic patterns for the target language.
+**General defaults** (no pack): clear naming, single responsibility, minimal comments, explicit error handling, idiomatic patterns for the target language.
 
 ---
 
@@ -67,16 +67,18 @@ Confirm with user: target directory / language・framework (if not in design) / 
 
 ### Self-Verification
 
-完了前に: core.md制約への違反をGrepで確認（例: `using System.Linq` / `catch`）。ビルド可能なら実行して確認。
+Before finishing: Grep the code for core.md constraint violations (e.g., `using System.Linq` / `catch`). Build and confirm if possible.
 
 ### Implementation Summary
+
+Headers in English; write prose content in Japanese:
 
 ```markdown
 <!-- IMPLEMENTATION_OUTPUT -->
 # Implementation: {Feature Name}
 
 ## Applied Knowledge Pack
-- Pack: {pack key} (core.md + {使用したサンプル/セクション})
+- Pack: {pack key} (core.md + {samples/sections used})
 
 ## Files Created
 | File | Purpose |
@@ -90,14 +92,14 @@ Confirm with user: target directory / language・framework (if not in design) / 
 
 ## Deviations from Design
 | Item | Deviation | Reason |
-（なければ "None - implemented as designed"）
+(If none: "None - implemented as designed")
 
 ## Self-Verification
-- Constraint check: {結果}
-- Build/Compile: {結果}
+- Constraint check: {result}
+- Build/Compile: {result}
 
 ## Dependencies Added
-（なければ "None"）
+(If none: "None")
 
 ## Usage Example
 {example code}
@@ -109,7 +111,7 @@ Confirm with user: target directory / language・framework (if not in design) / 
 
 ### File Output
 
-- **Standalone**: Suggest `{prefix}_implementation_output.md`（設計書と同じprefix）
+- **Standalone**: Suggest `{prefix}_implementation_output.md` (same prefix as the design doc)
 - **Workflow**: Output to the specified path
 
 ## Error Handling During Implementation

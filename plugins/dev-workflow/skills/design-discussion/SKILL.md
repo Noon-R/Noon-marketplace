@@ -8,7 +8,7 @@ description: |
   Supports standalone execution or as part of implementation-workflow. Runs interactively in the main thread.
 ---
 
-Structured design discussion workflow for implementation tasks. Helps users clarify requirements, explore design options, and produce a design document ready for implementation (by the implementer agent or manual coding).
+Structured design discussion workflow for implementation tasks. Helps users clarify requirements, explore design options, and produce a design document ready for implementation (by the implementer agent or manual coding). Communicate with the user in Japanese.
 
 ## Workflow Overview
 
@@ -40,13 +40,13 @@ Allow shorthand answers. Encourage context dumping — related docs, code snippe
 
 ### Knowledge Pack Selection
 
-実装時にimplementer agentがロードするナレッジパックをここで決定する。
+Decide here which knowledge pack the implementer agent will load.
 
-1. **一覧取得**: code-knowledgeスキルの `scripts/list_knowledge.py` で利用可能なパックを取得し、ユーザーに提示
-2. **選択**: プロジェクトに合うパックをユーザーが選択（複数可）
-3. **制約の先取り**: 選択パックの `core.md` を読み、**致命的制約（例: Unity = LINQ禁止・try-catch禁止）を設計判断に反映**する。詳細セクションはこの段階では読まない
+1. **List packs**: run code-knowledge's `scripts/list_knowledge.py` and present available packs
+2. **Select**: user picks the pack(s) matching the project
+3. **Front-load constraints**: read the selected pack's `core.md` and **reflect its critical constraints in design decisions** (e.g., Unity = no LINQ, no try-catch). Do not read detail sections at this stage
 
-**該当パックがない場合:**
+**When no pack matches:**
 
 ```
 ⚠ 該当するナレッジパックが見つかりません。
@@ -56,7 +56,7 @@ Allow shorthand answers. Encourage context dumping — related docs, code snippe
 ③ 一般的なベストプラクティスで進める
 ```
 
-②を選んだ場合はcode-knowledge-creatorスキルに移行し、パック作成後に設計議論へ戻る。
+If ② is chosen, switch to the code-knowledge-creator skill and return to design discussion after the pack is created.
 
 ### Clarifying Questions
 
@@ -74,13 +74,13 @@ Allow shorthand answers. Encourage context dumping — related docs, code snippe
 
 ### Design Options
 
-Propose 2-4 design approaches. For each: **Approach** / **Pros** / **Cons** / **Fit**（ナレッジパックの制約との整合を含む）. Ask user to evaluate.
+Propose 2-4 design approaches. For each: **Approach** / **Pros** / **Cons** / **Fit** (including consistency with the knowledge pack constraints). Ask user to evaluate.
 
 ### Decision Points
 
 For key architectural decisions: list the decision → present options with trade-offs → get user input → document decision and rationale.
 
-Common decision points: module/class structure, data flow and state management, error handling strategy（パックの制約に従う）, interface design, dependency management.
+Common decision points: module/class structure, data flow and state management, error handling strategy (follow pack constraints), interface design, dependency management.
 
 ### Refinement
 
@@ -92,7 +92,7 @@ Drill down into components, clarify interfaces, address edge cases, consider tes
 
 **Goal:** Produce a design document that the implementer agent can execute autonomously.
 
-設計書は**implementer agentが対話なしで実装できる粒度**で書く。曖昧さはOpen Questionsとして明示する。
+Write the design at a granularity that **the implementer agent can implement without dialogue**. Make ambiguities explicit as Open Questions.
 
 ### Output Format
 
@@ -108,8 +108,8 @@ Brief description of what will be implemented.
 - Non-functional requirements
 
 ## Knowledge Pack
-- Pack: {pack key（例: unity）}    ← implementer agentがこのキーでcore.md等をロードする
-- 設計に影響した制約: {例: try-catch禁止のためResult型でエラー伝搬}
+- Pack: {pack key (e.g., unity)}    ← the implementer agent loads core.md etc. with this key
+- Constraints that shaped the design: {e.g., Result-based error propagation due to no-try-catch rule}
 
 ## Architecture
 
@@ -148,7 +148,7 @@ classDiagram
 
 ### File Output
 
-- **Standalone**: Suggest `{prefix}_design_output.md`（prefix = 主要概念の小文字ASCII。不明ならユーザーに確認）
+- **Standalone**: Suggest `{prefix}_design_output.md` (prefix = main concept in lowercase ASCII; ask the user if unclear)
 - **Workflow integration**: Output to the path specified by implementation-workflow
 
 ## Tips for Effective Design Discussion
@@ -157,4 +157,4 @@ classDiagram
 - Make implicit assumptions explicit
 - Balance between over-design and under-design
 - Document "why" not just "what"
-- パックの致命的制約は設計段階で織り込む（実装段階での手戻りを防ぐ）
+- Bake the pack's critical constraints into the design stage (prevents rework during implementation)

@@ -87,7 +87,7 @@ def list_all_packs(as_json=False):
         display_name = pack.get('display_name', key)
         keywords = "'" + "', '".join(pack.get('keywords', [])) + "'"
         detail_level = pack.get('detail_level', 'basic')
-        print(f"- **{display_name}**: {keywords} (詳細度: {detail_level})")
+        print(f"- **{display_name}**: {keywords} (detail level: {detail_level})")
 
 
 def search_packs(keyword):
